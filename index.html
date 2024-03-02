@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do List</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+<style>
+.container {
+    max-width: 1000px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+input[type="text"] {
+    width: 70%;
+    padding: 8px;
+    margin-right: 5px;
+}
+
+button {
+    padding: 8px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+.deleteBtn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.deleteBtn:hover {
+    background-color: #da190b;
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+}
+.task-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.task-list li {
+    display: flex;
+    align-items: center;
+}
+
+.task-list li input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.task-list li button {
+    margin-right: 10px;
+}
+
+.task-list li span {
+    flex-grow: 1;
+}
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>To Do List</h1>
+        <input type="text" id="taskInput" placeholder="Add new task">
+        <input type="date" id="dueDateInput"> 
+        <button id="addTaskBtn">Add Task</button>
+        <ul id="taskList" class="task-list">
+        </ul>
+        <h2>Completed Tasks</h2>
+        <ul id="completedTasksList" class="task-list">
+        </ul>
+    </div>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const taskInput = document.getElementById('taskInput');
+    const dueDateInput = document.getElementById('dueDateInput');
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const taskList = document.getElementById('taskList');
+    const completedTasksList = document.getElementById('completedTasksList');
+
+    // add to the list
+    addTaskBtn.addEventListener('click', function() {
+    const taskText = taskInput.value.trim();
+    const dueDate = dueDateInput.value; // Get the due date value
+    if (taskText === '') {
+        alert('Input cannot be empty!!!'); // alert if empty
+        return; // stop running if empty is detected
+    }
+    addTask(taskText, dueDate);
+    taskInput.value = ''; 
+    dueDateInput.value = ''; 
+});
+
+
+    // mark as completed
+    taskList.addEventListener('click', function(e) {
+        if (e.target.tagName === 'INPUT' && e.target.type === 'checkbox') {
+            const listItem = e.target.parentElement;
+            if (e.target.checked) {
+                moveTaskToCompleted(listItem);
+            }
+        } else if (e.target.classList.contains('deleteBtn')) {
+            e.target.parentElement.remove();
+        }
+    });
+
+    // redo task
+    completedTasksList.addEventListener('click', function(e) {
+        if (e.target.classList.contains('deleteBtn')) {
+            e.target.parentElement.remove();
+        } else if (e.target.classList.contains('redoBtn')) {
+            const listItem = e.target.parentElement;
+            moveTaskToPending(listItem);
+        }
+    });
+
+    // add task to to do list
+    function addTask(taskText, dueDate) {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <input type="checkbox">
+            <span>${taskText}</span>
+            <span class="due-date">${dueDate}</span> <!-- Display due date -->
+            <button class="deleteBtn">Delete</button>
+        `;
+        taskList.appendChild(li);
+    }
+
+    // move to completed item
+    function moveTaskToCompleted(taskItem) {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.classList.add('deleteBtn', 'red');
+        
+        const redoBtn = document.createElement('button');
+        redoBtn.textContent = 'Redo';
+        redoBtn.classList.add('redoBtn', 'green');
+
+        const span = taskItem.querySelector('span').textContent;
+        const dueDate = taskItem.querySelector('.due-date').textContent; // Get the due date
+        taskItem.innerHTML = '';
+        taskItem.innerHTML += `<span>${span}</span>`;
+        taskItem.innerHTML += `<span class="due-date">${dueDate}</span>`; // Display due date
+        completedTasksList.appendChild(taskItem);
+	taskItem.appendChild(deleteBtn);
+        taskItem.appendChild(redoBtn);
+    }
+
+    // move back to to do list
+    function moveTaskToPending(taskItem) {
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        
+        const span = taskItem.querySelector('span').textContent;
+        const dueDate = taskItem.querySelector('.due-date').textContent; // Get the due date
+        taskItem.innerHTML = '';
+	taskItem.appendChild(checkbox);
+        taskItem.innerHTML += `<span>${span}</span>`;
+        taskItem.innerHTML += `<span class="due-date">${dueDate}</span>`; // Display due date
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.classList.add('deleteBtn', 'red');
+        taskItem.appendChild(deleteBtn);
+        
+
+        taskList.appendChild(taskItem);
+    }
+});
+
+</script>
+</body>
+</html>
+
+
